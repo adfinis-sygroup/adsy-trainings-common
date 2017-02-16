@@ -3,13 +3,17 @@ SLIDES  = $(SOURCES:.md=.html)
 PDFS  = $(SOURCES:.md=.pdf)
 TMP_PDFS = $(wildcard tmp-slides-*.pdf)
 
-PANDOCCMD=pandoc --to revealjs --template ../common/revealjs-template.pandoc --standalone --section-divs --no-highlight
-PHANTOMCMD=phantomjs ../common/phantomjs-revealjs-slide-capture.js 
+COMMON_DIR = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+PANDOCCMD=pandoc --to revealjs --template $(COMMON_DIR)revealjs-template.pandoc --standalone --section-divs --no-highlight
+PHANTOMCMD=phantomjs ../phantomjs-revealjs-slide-capture.js
 GSCMD=gs -q -dPDFSETTINGS=/printer -dNOPAUSE -dBATCH -sDEVICE=pdfwrite
 
-.PHONY: all clean
+#.PHONY: all clean
 
-all: $(SLIDES) $(PDFS)
+foo:
+	echo $(COMMON_DIR)
+
+all: $(SLIDES)
 
 %.pdf: %.html
 	@echo "building $@ from $<" && \
@@ -20,7 +24,7 @@ all: $(SLIDES) $(PDFS)
 
 %.html: %.md
 	@echo "building $@ from $<" && \
-	$(PANDOCCMD) $< -o $@
+	$(PANDOCCMD) $< -o build/$@
 
 clean:
 	-rm -f *.html *.pdf

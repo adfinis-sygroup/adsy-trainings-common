@@ -6,12 +6,12 @@
 
     <title>$title$</title>
 
-    <link rel="stylesheet" href="../common/reveal.js/css/reveal.css">
-    <link rel="stylesheet" href="../common/reveal.js/css/theme/white.css">
-    <link rel="stylesheet" href="../common/css/reveal-adsy.css">
+    <link rel="stylesheet" href="../../commons/reveal.js/css/reveal.css">
+    <link rel="stylesheet" href="../../commons/reveal.js/css/theme/white.css">
+    <link rel="stylesheet" href="../../commons/css/reveal-adsy.css">
 
     <!-- Theme used for syntax highlighting of code -->
-    <link rel="stylesheet" href="../common/css/monokai.css">
+    <link rel="stylesheet" href="../../commons/css/monokai.css">
   </head>
   <body>
     <div class="reveal">
@@ -20,8 +20,8 @@ $body$
       </div>
     </div>
 
-    <script src="../common/reveal.js/lib/js/head.min.js"></script>
-    <script src="../common/reveal.js/js/reveal.js"></script>
+    <script src="../../commons/reveal.js/lib/js/head.min.js"></script>
+    <script src="../../commons/reveal.js/js/reveal.js"></script>
 
     <script>
       // More info https://github.com/hakimel/reveal.js#configuration
@@ -41,10 +41,10 @@ $body$
 
         // More info https://github.com/hakimel/reveal.js#dependencies
         dependencies: [
-          { src: '../common/lib/js/classList.js', condition: function() { return !document.body.classList; } },
-          { src: '../common/reveal.js/plugin/notes/notes.js', async: true },
-          { src: '../common/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
-          { src: '../common/reveal.js-menu/menu.js', async: true, condition: function() { return !!document.body.classList; } }
+          { src: '../../commons/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: '../../commons/reveal.js/plugin/notes/notes.js', async: true },
+          { src: '../../commons/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+          { src: '../../commons/reveal.js-menu/menu.js', async: true, condition: function() { return !!document.body.classList; } }
         ]
       });
     </script>
