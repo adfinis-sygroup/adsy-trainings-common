@@ -11,14 +11,26 @@
 div#header,
 .section.slide.level1,
 .titleslide.slide.level1 {
-  height: 210mm;
   width: 297mm;
+  min-height: 210mm;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   margin-bottom: 20px;
 }
+
+.section.level2 {
+  height: 210mm;
+  width: 297mm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin-bottom: 0px;
+  border: 5px solid transparent;
+}
+
 div#header h1 {
   font-size: 2.5em;
 }
