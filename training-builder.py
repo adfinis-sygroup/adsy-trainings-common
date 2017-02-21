@@ -91,7 +91,7 @@ def build_pdf(source_file, dest_file, commons_dir, build_path):
     subprocess.check_call(wkhtmltopdf_cmd_arr)
 
     # delete temp file
-    #os.remove(otmp)
+    os.remove(otmp)
 
 
 
