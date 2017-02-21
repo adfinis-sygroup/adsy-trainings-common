@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -8,8 +8,11 @@ import yaml
 import jinja2
 import subprocess
 import argparse
+import fnmatch
 
 from pprint import pprint
+#sys.setdefaultencoding('utf8')
+
 
 
 INDEX_COPY_FILES=[
@@ -20,6 +23,7 @@ INDEX_COPY_FILES=[
 
 def jinja2_basename_filter(path):
     return os.path.basename(path)
+
 
 
 def render_template(tpl_path, context):
@@ -53,6 +57,7 @@ def build_html(source_file, dest_file, commons_dir):
     subprocess.check_call(pandoc_cmd_arr)
 
 
+
 def build_pdf(source_file, dest_file, commons_dir, build_path):
 
     otmp = "{0}/{1}.tmp.html".format(
@@ -65,6 +70,7 @@ def build_pdf(source_file, dest_file, commons_dir, build_path):
         "pandoc",
         "-c",
         "../../commons/pdf/style.css",
+        #"--section-divs",
         source_file,
         "-o",
         otmp
@@ -74,6 +80,7 @@ def build_pdf(source_file, dest_file, commons_dir, build_path):
     # then convert this to html
     wkhtmltopdf_cmd_arr = [
         "wkhtmltopdf",
+        #"--quiet",
         "--page-width",
         "200",
         "--page-height",
@@ -84,8 +91,32 @@ def build_pdf(source_file, dest_file, commons_dir, build_path):
     subprocess.check_call(wkhtmltopdf_cmd_arr)
 
     # delete temp file
-    os.remove(otmp)
+    #os.remove(otmp)
 
+
+
+def find_training_yaml(root_dir, commons_dir, build_dir):
+    try:
+        _index_files = glob.glob(
+            "{0}/**/*yml".format(
+                root_dir
+            ),
+            recursive = True
+        )
+    # python < 3.5
+    except TypeError:
+        _index_files = []
+        for root, dirnames, filenames in os.walk(root_dir):
+            for filename in fnmatch.filter(filenames, "*.yml"):
+                _index_files.append(os.path.join(root, filename))
+
+    # remove unwanted files from build/comons
+    index_files = []
+    for f in _index_files:
+        if not f.startswith(commons_dir) and not f.startswith(build_dir):
+            index_files.append(f)
+
+    return index_files
 
 
 
@@ -123,16 +154,12 @@ def main():
     if not args.ignore:
         args.ignore = []
 
-    #print(root_dir, commons_dir_abs, build_dir)
-    #return
 
-    index_files = glob.glob(
-        "{0}/**/*yml".format(
-            root_dir
-        ),
-        recursive = True
+    index_files = find_training_yaml(
+        root_dir,
+        commons_dir_abs,
+        build_dir
     )
-
     training_list = {}
 
     ## Copy commons files first for phantom
@@ -164,9 +191,10 @@ def main():
         )
         build_path_root_abs = build_dir
 
-
-        yf = open(yaml_file)
+        print(yaml_file)
+        yf = open(yaml_file, encoding="utf-8")
         training_yaml = yaml.load(yf)
+
         tt = {
             "category": training_yaml['Area'],
             "name": training_yaml['Name'],
@@ -279,7 +307,7 @@ def main():
         build_dir
     )
 
-    file_object  = open(output_index, "w")
+    file_object  = open(output_index, "w", encoding="utf-8")
     file_object.write(
         output_index_html
     )
