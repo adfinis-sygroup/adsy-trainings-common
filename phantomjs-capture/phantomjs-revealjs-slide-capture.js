@@ -22,32 +22,17 @@ var prefix = args.length >= 3 ? args[2] : 'tmp-slide-';
 // Set render size.
 page.papersize = { format: 'A4', orientation: 'landscape' };
 
-// Open the url and do your thing.
-page.open(url, function (status) {
 
-    if (status !== 'success') {
-        console.error('Failed to open url ' + url);
-        phantom.exit();
-    }
 
-    // Disable slide transitions so we don't lose time on that.
-    page.evaluate(function() {
-        // Apparently setting "transition" and "backgroundTransition" to "none"
-        // is enough to disable slide transitions, even if there are per-slide transitions.
-        Reveal.configure({
-            'transition': 'none',
-            'backgroundTransition': 'none'
-        });
+
+
+var _capture = function(page){
+  console.log("DO THE CAPTURE");
+
+    page.evaluate(function(){
+      hljs.initHighlighting();
+      console.log("EVALUATE");
     });
-
-    // Disable transitions on "fragmented views".
-    page.evaluate(function() {
-        var fragments = document.getElementsByClassName('fragment');
-        for (var f = fragments.length - 1; f >= 0; f--) {
-            fragments[f].classList.remove('fragment');
-        }
-    });
-
 
     // Render all slides.
     var slideCounter = 1;
@@ -79,7 +64,42 @@ page.open(url, function (status) {
         next();
         slideCounter++;
     }
+    console.log("PHANTOM DONE");
+    //phantom.exit();
+}
 
-    phantom.exit();
+
+// Open the url and do your thing.
+page.open(url, function (status) {
+
+    if (status !== 'success') {
+        console.error('Failed to open url ' + url);
+        phantom.exit();
+    }
+
+    // Disable slide transitions so we don't lose time on that.
+    page.evaluate(function() {
+        // Apparently setting "transition" and "backgroundTransition" to "none"
+        // is enough to disable slide transitions, even if there are per-slide transitions.
+        Reveal.configure({
+            'transition': 'none',
+            'backgroundTransition': 'none'
+        });
+    });
+
+    // Disable transitions on "fragmented views".
+    page.evaluate(function() {
+        var fragments = document.getElementsByClassName('fragment');
+        for (var f = fragments.length - 1; f >= 0; f--) {
+            fragments[f].classList.remove('fragment');
+        }
+    });
+
+
+    setTimeout(function(){
+      _capture(page)
+    }, 5000);
+
+    //console.log("INIT");
 
 });

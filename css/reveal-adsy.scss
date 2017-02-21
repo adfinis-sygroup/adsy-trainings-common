@@ -46,9 +46,9 @@
     font-size: 1em
   }
 
-  pre code {
+  /*pre code {
     font-family: "Source Code Pro", monospace;
-  }
+  }*/
 
   section img {
     border: none;
@@ -58,4 +58,10 @@
   blockquote {
     border-left: 10px solid;
   }
+}
+
+
+.reveal pre code {
+  color: white ! important;
+  z-index: 999999;
 }
