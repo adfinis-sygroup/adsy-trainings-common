@@ -11,14 +11,7 @@ import argparse
 import fnmatch
 
 from pprint import pprint
-#sys.setdefaultencoding('utf8')
 
-
-
-INDEX_COPY_FILES=[
-    "adcssy.min.css",
-    "trainings.css"
-]
 
 
 def jinja2_basename_filter(path):
@@ -60,7 +53,7 @@ def build_html(source_file, dest_file, commons_dir):
 
 def build_pdf(source_file, dest_file, commons_dir, build_path):
 
-    otmp = "{0}/{1}.tmp.html".format(
+    temp_html_file = "{0}/{1}.tmp.html".format(
         os.path.dirname( dest_file ),
         os.path.basename( dest_file )
     )
@@ -70,28 +63,26 @@ def build_pdf(source_file, dest_file, commons_dir, build_path):
         "pandoc",
         "-c",
         "../../commons/pdf/style.css",
-        #"--section-divs",
         source_file,
         "-o",
-        otmp
+        temp_html_file
     ]
     subprocess.check_call(pandoc_cmd_arr)
 
     # then convert this to html
     wkhtmltopdf_cmd_arr = [
         "wkhtmltopdf",
-        #"--quiet",
         "--page-width",
         "200",
         "--page-height",
         "145",
-        otmp,
+        temp_html_file,
         dest_file
     ]
     subprocess.check_call(wkhtmltopdf_cmd_arr)
 
     # delete temp file
-    os.remove(otmp)
+    #os.remove(temp_html_file)
 
 
 
@@ -145,6 +136,19 @@ def main():
         action="append",
         help="Ignore training"
     )
+    parser.add_argument(
+        "--index-only",
+        action="store_true",
+        default=False,
+        help="Only build index, no content"
+    )
+    parser.add_argument(
+        "--no-pdf",
+        action="store_true",
+        default=False,
+        help="Skip PDF building"
+    )
+
 
     args = parser.parse_args()
 
@@ -191,11 +195,10 @@ def main():
         )
         build_path_root_abs = build_dir
 
-        print(yaml_file)
         yf = open(yaml_file, encoding="utf-8")
         training_yaml = yaml.load(yf)
 
-        tt = {
+        training_dict = {
             "category": training_yaml['Area'],
             "name": training_yaml['Name'],
             "description": training_yaml['Description'],
@@ -227,13 +230,15 @@ def main():
                 fname_no_ext
             )
 
-            tt['files_html'].append(
+            training_dict['files_html'].append(
                 "{0}/{1}.html".format(
                     training_dir,
                     fname_no_ext
                 )
             )
             print("   > {0}.html".format(fname_no_ext))
+            if args.index_only:
+                continue
             build_html(md, html_build_file, commons_dir_abs)
 
 
@@ -259,7 +264,7 @@ def main():
 
 
         # then build pdf from generated html
-        for htmlf in tt['files_html']:
+        for htmlf in training_dict['files_html']:
             fname_no_ext = os.path.splitext(
                 os.path.basename( htmlf )
             )[0]
@@ -272,15 +277,15 @@ def main():
                 fname_no_ext
             )
             print("   > {0}.pdf".format(fname_no_ext))
+            if not args.index_only and not args.no_pdf:
+                build_pdf(
+                    html_build_file,
+                    pdf_output,
+                    commons_dir_abs,
+                    build_path_root_abs
+                )
 
-            build_pdf(
-                html_build_file,
-                pdf_output,
-                commons_dir_abs,
-                build_path_root_abs
-            )
-
-            tt['files_pdf'].append(
+            training_dict['files_pdf'].append(
                 "{0}/{1}.pdf".format(
                     training_dir,
                     fname_no_ext
@@ -288,9 +293,9 @@ def main():
             )
 
         # append to dict for index file
-        tt['files_html'] = sorted(tt['files_html'])
-        tt['files_pdf']  = sorted(tt['files_pdf'])
-        training_list[training_yaml['Area']].append(tt)
+        training_dict['files_html'] = sorted(training_dict['files_html'])
+        training_dict['files_pdf']  = sorted(training_dict['files_pdf'])
+        training_list[training_yaml['Area']].append(training_dict)
 
 
     ## Build the index template
@@ -312,22 +317,6 @@ def main():
         output_index_html
     )
 
-
-    # # copy css for index
-    # for css in INDEX_COPY_FILES:
-    #     src = "{0}/index/{1}".format(
-    #         commons_dir_abs,
-    #         css
-    #     )
-    #     dst = "{0}/{1}".format(
-    #         build_dir,
-    #         css
-    #     )
-    #     subprocess.check_call([
-    #         "cp",
-    #         src,
-    #         dst
-    #     ])
 
 
 
