@@ -1,5 +1,7 @@
 @charset "UTF-8";
 @import url(https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700);
+@import url(https://www.adfinis-sygroup.ch/_fonts/the-sans-office.css);
+/*
 @font-face {
   font-family: "TheSansOffice";
   src: url(../fonts/TheSansOffice5_c.eot);
@@ -13,6 +15,7 @@
   src: local("â?º"), url(../fonts/TheSansOffice7_c.woff) format("woff"), url(../fonts/thesansoffice7_c.svg#thesansoffice) format("svg");
   font-style: normal;
   font-weight: bold; }
+*/
 
 #root {
   --adsy-lightgray-pantone: #baae9f;
