@@ -1,0 +1,69 @@
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Adfinis SyGroup Trainings</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="./commons/index/adcssy.min.css">
+    <link rel="stylesheet" href="./commons/index/trainings.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  </head>
+  <body class="page">
+    <div class="page-viewport">
+
+
+
+
+        <section class="page-content page-content--scroll">
+          <section class="page-content-main">
+
+
+
+              <h1 class="styleguide">Adfinis SyGroup Trainings</h1>
+              <br><br>
+
+              <div class="training-list">
+                {% for category, trainings in training_list.items() %}
+                  <div class="training-category">
+                    <h2>{{category}}</h2>
+                    {% for training in trainings %}
+
+                      <div class="training-item">
+                        <h3>{{training['name']}}</h3>
+                        <p>{{training['description']}}</p>
+                        <div class="html-list">
+                          {% for file_html in training['files_html'] %}
+                            <div>
+                              <a href="{{file_html}}">
+                                {{file_html | basename}}
+                              </a>
+                            </div>
+                          {% endfor %}
+                        </div>
+                        <div class="pdf-list">
+                          {% for file_pdf in training['files_pdf'] %}
+                            <div>
+                              <a href="{{file_pdf}}">
+                                {{file_pdf | basename}}
+                              </a>
+                            </div>
+                          {% endfor %}
+                        </div>
+                      </div>
+
+                    {% endfor %}
+                  </div>
+                {% endfor %}
+              </div>
+
+
+          </section>
+          <footer class="page-footer">
+          </footer>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
