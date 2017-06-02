@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-import sys
 import glob
 import yaml
 import jinja2
@@ -10,13 +9,9 @@ import subprocess
 import argparse
 import fnmatch
 
-from pprint import pprint
-
-
 
 def jinja2_basename_filter(path):
     return os.path.basename(path)
-
 
 
 def render_template(tpl_path, context):
@@ -28,7 +23,6 @@ def render_template(tpl_path, context):
     )
     env.filters['basename'] = jinja2_basename_filter
     return env.get_template(filename).render(context)
-
 
 
 def build_html(source_file, dest_file, commons_dir):
@@ -50,12 +44,11 @@ def build_html(source_file, dest_file, commons_dir):
     subprocess.check_call(pandoc_cmd_arr)
 
 
-
 def build_pdf(source_file, dest_file, commons_dir, build_path):
 
     temp_html_file = "{0}/{1}.tmp.html".format(
-        os.path.dirname( dest_file ),
-        os.path.basename( dest_file )
+        os.path.dirname(dest_file),
+        os.path.basename(dest_file)
     )
 
     # create a html that works with pdf css
@@ -82,8 +75,7 @@ def build_pdf(source_file, dest_file, commons_dir, build_path):
     subprocess.check_call(wkhtmltopdf_cmd_arr)
 
     # delete temp file
-    #os.remove(temp_html_file)
-
+    # os.remove(temp_html_file)
 
 
 def find_training_yaml(root_dir, commons_dir, build_dir):
@@ -108,7 +100,6 @@ def find_training_yaml(root_dir, commons_dir, build_dir):
             index_files.append(f)
 
     return index_files
-
 
 
 def main():
@@ -149,7 +140,6 @@ def main():
         help="Skip PDF building"
     )
 
-
     args = parser.parse_args()
 
     root_dir = os.path.realpath(args.root)
@@ -158,7 +148,6 @@ def main():
     if not args.ignore:
         args.ignore = []
 
-
     index_files = find_training_yaml(
         root_dir,
         commons_dir_abs,
@@ -166,7 +155,7 @@ def main():
     )
     training_list = {}
 
-    ## Copy commons files first for phantom
+    # Copy commons files first for phantom
     subprocess.check_call([
         "cp",
         "-ra",
@@ -176,10 +165,9 @@ def main():
         )
     ])
 
-
     for yaml_file in sorted(index_files):
 
-        training_dir = os.path.dirname( os.path.relpath(yaml_file, root_dir) )
+        training_dir = os.path.dirname(os.path.relpath(yaml_file, root_dir))
 
         rdir = training_dir.split("/")[0]
         if rdir in args.ignore:
@@ -211,7 +199,7 @@ def main():
         print("Building: {0}".format(training_dir))
 
         # Find all Markdown files in currend dir
-        os.makedirs( build_path, exist_ok=True )
+        os.makedirs(build_path, exist_ok=True)
         markdown_files = glob.glob(
             "{0}/*md".format(source_dir)
         )
@@ -219,13 +207,9 @@ def main():
         # Build HTML files from Markdown
         for md in markdown_files:
             fname_no_ext = os.path.splitext(
-                os.path.basename( md )
+                os.path.basename(md)
             )[0]
             html_build_file = "{0}/{1}.html".format(
-                build_path,
-                fname_no_ext
-            )
-            pdf_build_file = "{0}/{1}.pdf".format(
                 build_path,
                 fname_no_ext
             )
@@ -241,9 +225,9 @@ def main():
                 continue
             build_html(md, html_build_file, commons_dir_abs)
 
-
         # copy image dirs
-        static_dirs = [ name for name in os.listdir(source_dir) if os.path.isdir(os.path.join(source_dir, name)) ]
+        static_dirs = [name for name in os.listdir(source_dir)
+                       if os.path.isdir(os.path.join(source_dir, name))]
         for sdir in static_dirs:
             src = "{0}/{1}/{2}".format(
                 root_dir,
@@ -262,11 +246,10 @@ def main():
                 dst
             ])
 
-
         # then build pdf from generated html
         for htmlf in training_dict['files_html']:
             fname_no_ext = os.path.splitext(
-                os.path.basename( htmlf )
+                os.path.basename(htmlf)
             )[0]
             html_build_file = "{0}/{1}.html".format(
                 build_path,
@@ -297,14 +280,12 @@ def main():
         training_dict['files_pdf']  = sorted(training_dict['files_pdf'])
         training_list[training_yaml['Area']].append(training_dict)
 
-
-    ## Build the index template
+    # Build the index template
     context = {
-         "training_list": training_list
+        "training_list": training_list
     }
 
     _tpl_path = "{0}/index/template.html".format(commons_dir_abs)
-
 
     output_index_html = render_template(_tpl_path, context)
 
@@ -316,11 +297,6 @@ def main():
     file_object.write(
         output_index_html
     )
-
-
-
-
-
 
 
 if __name__ == '__main__':
