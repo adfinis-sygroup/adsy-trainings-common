@@ -155,6 +155,9 @@ def main():
     )
     training_list = {}
 
+    if not os.path.exists(build_dir):
+        os.makedirs(build_dir)
+
     # Copy commons files first for phantom
     subprocess.check_call([
         "cp",
