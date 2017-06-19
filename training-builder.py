@@ -2,12 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 import glob
 import yaml
 import jinja2
 import subprocess
 import argparse
 import fnmatch
+
+
+from pprint import pprint
 
 
 def jinja2_basename_filter(path):
@@ -78,7 +82,7 @@ def build_pdf(source_file, dest_file, commons_dir, build_path):
     # os.remove(temp_html_file)
 
 
-def find_training_yaml(root_dir, commons_dir, build_dir):
+def find_training_yaml(root_dir, commons_dir, build_dir, only=False):
     try:
         _index_files = glob.glob(
             "{0}/**/*yml".format(
@@ -99,7 +103,19 @@ def find_training_yaml(root_dir, commons_dir, build_dir):
         if not f.startswith(commons_dir) and not f.startswith(build_dir):
             index_files.append(f)
 
-    return index_files
+    # if only is set, remove all other trainings
+    if only:
+        only_index = []
+        for f in index_files:
+            chk = f.replace("{0}/".format(root_dir), "")
+            if chk.startswith(only):
+                only_index.append(f)
+
+    if only_index:
+        return only_index
+    else:
+        return index_files
+
 
 
 def main():
@@ -139,6 +155,11 @@ def main():
         default=False,
         help="Skip PDF building"
     )
+    parser.add_argument(
+        "--only",
+        default=False,
+        help="Only build single training"
+    )
 
     args = parser.parse_args()
 
@@ -151,9 +172,15 @@ def main():
     index_files = find_training_yaml(
         root_dir,
         commons_dir_abs,
-        build_dir
+        build_dir,
+        args.only
     )
+
     training_list = {}
+
+    # create build dir if it not exists
+    if not os.path.exists(build_dir):
+        os.makedirs(build_dir)
 
     # Copy commons files first for phantom
     subprocess.check_call([
@@ -228,6 +255,7 @@ def main():
         # copy image dirs
         static_dirs = [name for name in os.listdir(source_dir)
                        if os.path.isdir(os.path.join(source_dir, name))]
+
         for sdir in static_dirs:
             src = "{0}/{1}/{2}".format(
                 root_dir,
@@ -239,6 +267,11 @@ def main():
                 training_dir,
                 sdir
             )
+            if os.path.exists(dst):
+                dst = "{0}/{1}".format(
+                    build_dir,
+                    training_dir
+                )
             subprocess.check_call([
                 "cp",
                 "-ra",
