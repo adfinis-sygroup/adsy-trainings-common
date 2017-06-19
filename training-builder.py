@@ -104,6 +104,7 @@ def find_training_yaml(root_dir, commons_dir, build_dir, only=False):
             index_files.append(f)
 
     # if only is set, remove all other trainings
+    only_index = False
     if only:
         only_index = []
         for f in index_files:
