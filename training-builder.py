@@ -212,7 +212,7 @@ def main():
         build_path_root_abs = build_dir
 
         yf = open(yaml_file, encoding="utf-8")
-        training_yaml = yaml.load(yf)
+        training_yaml = yaml.safe_load(yf)
 
         training_dict = {
             "category": training_yaml['Area'],
